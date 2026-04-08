@@ -1,0 +1,63 @@
+digraph pilot_routing {
+    rankdir=TB;
+    node [fontname="monospace", fontsize=11];
+    edge [fontsize=10];
+
+    // Entry
+    user [label="YOUR MESSAGE", shape=doublecircle, style=filled, fillcolor="#1a1a2e", fontcolor=white];
+
+    // Intent Detection
+    intent [label="PILOT\nintent detection", shape=diamond, style=filled, fillcolor="#16213e", fontcolor=white];
+
+    // Pipeline nodes
+    build   [label="BUILD\nPIPELINE",   shape=box, style=filled, fillcolor="#0f3460", fontcolor=white];
+    improve [label="IMPROVE\nPIPELINE", shape=box, style=filled, fillcolor="#0f3460", fontcolor=white];
+    debug   [label="DEBUG\nPIPELINE",   shape=box, style=filled, fillcolor="#0f3460", fontcolor=white];
+    explain [label="EXPLAIN\n(inline)",  shape=box, style=filled, fillcolor="#533483", fontcolor=white];
+    advance [label="ADVANCE\nSTAGE",    shape=box, style=filled, fillcolor="#533483", fontcolor=white];
+    finish  [label="FINISH\nPIPELINE",  shape=box, style=filled, fillcolor="#0f3460", fontcolor=white];
+    redirect [label="REDIRECT\n(re-ask)", shape=box, style=filled, fillcolor="#533483", fontcolor=white];
+
+    // Superpowers skills
+    q6        [label="6 Product Questions\n(no tech jargon)", shape=note, style=filled, fillcolor="#e94560", fontcolor=white];
+    spec      [label="Silent Spec Generation\n(Claude picks stack)", shape=note, style=filled, fillcolor="#e94560", fontcolor=white];
+    wplans    [label="superpowers:\nwriting-plans", shape=component, style=filled, fillcolor="#533483", fontcolor=white];
+    subagent  [label="superpowers:\nsubagent-driven-development\n(parallel agent team)", shape=component, style=filled, fillcolor="#533483", fontcolor=white];
+    verify    [label="superpowers:\nverification-before-completion", shape=component, style=filled, fillcolor="#533483", fontcolor=white];
+    sysdbg    [label="superpowers:\nsystematic-debugging", shape=component, style=filled, fillcolor="#533483", fontcolor=white];
+    finishing [label="superpowers:\nfinishing-a-development-branch", shape=component, style=filled, fillcolor="#533483", fontcolor=white];
+
+    // Outputs
+    app_done  [label="Working App\n\"Run python app.py\"", shape=doubleoctagon, style=filled, fillcolor="#1a1a2e", fontcolor=white];
+    fixed     [label="Change Applied\n\"Done. [what changed]\"", shape=doubleoctagon, style=filled, fillcolor="#1a1a2e", fontcolor=white];
+    bug_fixed [label="Bug Fixed\n+ root cause (1 line)", shape=doubleoctagon, style=filled, fillcolor="#1a1a2e", fontcolor=white];
+    shipped   [label="Committed + Pushed\n\"[N] files on [branch]\"", shape=doubleoctagon, style=filled, fillcolor="#1a1a2e", fontcolor=white];
+
+    // Routing edges
+    user -> intent;
+    intent -> build    [label="let's / build /\ncreate / new / want"];
+    intent -> improve  [label="add / change /\nupdate / I want you to"];
+    intent -> debug    [label="error / broken /\nbig issue / [paste]"];
+    intent -> explain  [label="why / how /\nwhat is / explain"];
+    intent -> advance  [label="yes / ok / yeah /\ngreat / approved"];
+    intent -> finish   [label="commit / push /\nsave / ship"];
+    intent -> redirect [label="no / nope /\ndon't want / wrong"];
+
+    // Build pipeline chain
+    build -> q6 -> spec -> wplans -> subagent -> app_done;
+
+    // Improve pipeline chain
+    improve -> verify -> fixed;
+
+    // Debug pipeline chain
+    debug -> sysdbg -> bug_fixed;
+
+    // Finish pipeline chain
+    finish -> finishing -> shipped;
+
+    // Advance loops back
+    advance -> intent [label="re-evaluate\ncurrent stage", style=dashed];
+
+    // Redirect loops back
+    redirect -> intent [label="re-ask\none question", style=dashed];
+}
