@@ -30,6 +30,22 @@ Read the first 1–3 words plus any trigger words. Route immediately.
 
 **Trigger:** User wants something new — app, dashboard, tool, feature.
 
+### Step 0: Project Research (Before First Question)
+
+Before asking anything, silently scan the current project directory:
+
+- What files and folders already exist?
+- Any existing Flask apps, databases, `.env` files, config files, or API credentials?
+- Any existing code that should be built on top of — not duplicated?
+- What port is already in use? What schema does an existing DB have?
+
+Summarize what you found in one line before the first question:
+> "I can see you have an existing Flask app on port 5000 and a `leads.db` SQLite database. I'll build on top of those."
+
+If the directory is empty, say nothing and go straight to questions.
+
+---
+
 ### Step 1: Product Discovery (90% Confidence Model)
 
 Ask questions **one at a time**, plain English only, no technical questions ever. Keep asking until confidence reaches 90%+ across all 8 dimensions. Minimum ~5 questions, no fixed upper limit.
@@ -56,12 +72,13 @@ After each answer, silently assess: which dimensions are still below 90%? Ask th
 - Plain English — never ask about frameworks, databases, APIs, architecture
 - If an answer covers multiple dimensions, mark them all and skip those questions
 - If the user is vague, ask a follow-up on the same dimension before moving on
+- Use what was found in Step 0 to skip questions already answered by existing code
 
-After reaching 90%+:
+---
 
-### Step 2: Spec (Internal — No User Input Required)
+### Step 2: Full Spec + Rich Summary
 
-Translate answers into a complete technical spec silently. Never ask the user to choose a framework, database, architecture, or stack.
+Translate all answers into a complete technical spec internally. Never ask the user to choose a framework, database, architecture, or stack.
 
 **Default stack** (use unless user specified otherwise):
 - Backend: Python / Flask
@@ -69,29 +86,125 @@ Translate answers into a complete technical spec silently. Never ask the user to
 - Database: SQLite
 - Structure: Single-folder, runnable with `python app.py`
 
-Then write a plain-English summary — 3–5 bullets of what you're building:
-> "Here's what we're building:
-> - A Flask web app that runs locally on port 5000
-> - A dashboard showing [X] with [Y] sections
-> - Data stored in SQLite, auto-populated by [Z]
-> - No install required beyond `pip install flask`"
+Then present the full plain-English summary. This is not a short list — cover everything so the user can catch anything wrong before a single line of code is written:
+
+```
+Here's what we're building:
+
+WHAT IT DOES
+[Full description of the app's purpose and how it works, 2-4 sentences]
+
+WHO USES IT + HOW
+[Walk through a complete typical session from open to close]
+
+EVERY FEATURE
+Must-haves:
+  - [feature 1]
+  - [feature 2]
+  - [feature 3]
+Nice-to-haves (built only if time allows):
+  - [feature A]
+  - [feature B]
+
+WHAT GETS CREATED
+  app.py              ← Flask server, all routes
+  templates/
+    index.html        ← main dashboard
+    [other pages]     ← [purpose]
+  static/
+    main.js           ← frontend logic
+    style.css         ← all styles
+  db/
+    [name].db         ← SQLite database, [what it stores]
+  .env.example        ← API keys template (never hardcoded)
+
+HOW TO RUN
+  pip install flask [other deps]
+  python app.py
+  Open http://localhost:[port]
+
+DATA + CONNECTIONS
+  - Stores: [what gets saved, fields, structure]
+  - Reads from: [any existing files or databases being reused]
+  - Connects to: [any APIs, services, external sources]
+
+WHAT "DONE" LOOKS LIKE
+[Restate their success criteria in their words]
+```
 
 Wait for approval. User says `yes / ok / looks good / approved` → proceed.
+If they correct anything, update the spec and re-show only the changed sections.
 
-### Step 3: Plan → Build
+---
 
-Invoke **`superpowers:writing-plans`** with the full spec.
+### Step 3: Scope Check
+
+Estimate the number of independent implementation tasks from the spec.
+
+**If 7 or fewer tasks:** proceed directly.
+
+**If 8 or more tasks:** flag it before building:
+> "This is a larger build — I'm estimating [N] tasks. One-shot will work but will take a while and use a lot of context.
+> Two options:
+> - **One-shot:** Build everything now, start to finish
+> - **Core first:** Build the [2-3 most critical features] now, add the rest in the next session
+> Which do you want?"
+
+Wait for answer. Proceed accordingly.
+
+---
+
+### Step 4: Interface Contract
+
+Before spawning any agents, generate a shared contract document that every agent will receive. This prevents agents building pieces that don't connect.
+
+```
+INTERFACE CONTRACT
+
+API ENDPOINTS
+  [METHOD] /[path]     → returns { [field]: [type], ... }
+  [METHOD] /[path]     → returns { [field]: [type], ... }
+
+DATABASE SCHEMA
+  table [name] (
+    [column]  [type],
+    ...
+  )
+
+FILE STRUCTURE
+  [file]    ← owned by: [agent/task]
+  [file]    ← owned by: [agent/task]
+
+SHARED CONSTANTS
+  PORT = [number]
+  DB_PATH = "[path]"
+  [other shared values]
+```
+
+Show the user a brief version — just the API endpoints and file list:
+> "Here's how the pieces connect: [endpoints] [files]"
+
+This is informational, not a new approval gate. If they say something looks wrong, fix it. Otherwise proceed immediately.
+
+---
+
+### Step 5: Plan → Build
+
+Invoke **`superpowers:writing-plans`** with the full spec AND the interface contract.
 
 After the plan is written, invoke **`superpowers:subagent-driven-development`** to execute it.
 
-Pass this into subagent-driven-development:
-> "Apply these developer directives to all agents:
+Pass this into every agent via subagent-driven-development:
+> "Apply these directives to all agents:
 > - Lead with result, not explanation
 > - Make all technical decisions — never ask the developer for technical choices
-> - Default stack: Python/Flask + vanilla JS + SQLite
+> - Default stack: Python/Flask + vanilla JS + SQLite, no npm, no build step
 > - Functions under 50 lines, files under 400 lines
-> - Always handle errors with try/catch
-> - Never hardcode API keys"
+> - Always handle errors with try/catch or try/except
+> - Never hardcode API keys — use .env
+> - Backend tests: pytest. Frontend: no test framework — verify by checking it loads correctly
+> - Follow the interface contract exactly — don't invent new endpoints or rename existing ones
+> [paste full interface contract here]"
 
 Report when done: "App is ready. Run `python app.py` to start."
 
@@ -149,9 +262,10 @@ Default behavior: stage changed files, commit with descriptive message, push to 
 
 | When it appears | What it means | Action |
 |---|---|---|
-| During 6-question discovery | Answer to current question | Ask next question |
-| After plain-English summary | Spec approved | Invoke writing-plans |
-| After plan presented | Plan approved | Invoke subagent-driven-development |
+| During discovery questions | Answer to current question | Assess confidence, ask next |
+| After full summary | Spec approved | Run scope check, show interface contract, invoke writing-plans |
+| After scope options presented | Choice made | Proceed with selected scope |
+| After interface contract shown | Acknowledged | Invoke subagent-driven-development |
 | After build complete | Looks good | Offer to commit/push |
 | After explanation | Got it | Continue with what's next |
 | After change/fix | Done looks right | Close out |
@@ -176,7 +290,15 @@ Apply to every message, every pipeline, every sub-skill invoked:
 ## Quick Reference
 
 ```
-User says "let's build X"       → 6 product questions → spec → writing-plans → subagent-driven-development
+User says "let's build X"
+  → Step 0: scan project (existing files, DBs, APIs)
+  → Step 1: questions until 90% confidence (5-15 questions)
+  → Step 2: full plain-English summary (everything — features, files, how to run)
+  → Step 3: scope check (flag if 8+ tasks, offer core-first option)
+  → Step 4: interface contract (endpoints, schema, file ownership)
+  → Step 5: writing-plans → subagent-driven-development (14+ agents)
+  → "App is ready. Run python app.py"
+
 User says "add Y"               → direct change → verification-before-completion
 User pastes error               → systematic-debugging → fix
 User says "yes/ok"              → advance current stage (see stage table)
