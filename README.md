@@ -1,16 +1,70 @@
-# hc — Personal Claude Code Setup
+# hc — Personal Claude Code + Codex Setup
 
 My personal pilot skill and workflow documentation. The `pilot` skill is a single entry point that routes natural language into the right superpowers workflow chains automatically, with my behavioral profile baked in.
 
+Works in both **Claude Code** and **Codex** — one skill file, one source of truth.
+
 ---
 
-## How to Install
+## Install
+
+### Claude Code
 
 ```bash
 cp -r skills/pilot ~/.claude/skills/pilot
 ```
 
-Restart Claude Code. `pilot` will appear in the skills list automatically.
+Restart Claude Code. `pilot` appears in the skills list automatically.
+
+### Codex
+
+Codex reads from `~/.agents/skills/`. Use a symlink so both tools share the same file — edit once, works everywhere:
+
+```bash
+mkdir -p ~/.agents/skills
+ln -sf ~/.claude/skills/pilot ~/.agents/skills/pilot
+```
+
+If you don't have Claude Code installed, copy directly instead:
+
+```bash
+mkdir -p ~/.agents/skills
+cp -r skills/pilot ~/.agents/skills/pilot
+```
+
+Restart Codex. `pilot` is discovered automatically.
+
+### Keeping in sync
+
+The symlink approach means `~/.claude/skills/pilot/SKILL.md` is the single source of truth. Any edit you make to the skill is instantly available in both Claude Code and Codex — no copy step needed.
+
+### Prerequisites for Codex subagent features
+
+The build pipeline spawns multiple agents in parallel. Enable multi-agent support in Codex:
+
+```toml
+# ~/.codex/config.toml
+[features]
+multi_agent = true
+```
+
+Without this, the improve/debug/finish pipelines still work — only the full build pipeline requires it.
+
+---
+
+## How Tool Names Map (Codex vs Claude Code)
+
+The pilot skill calls superpowers skills by name — those work the same in both tools. Internally, superpowers uses Claude Code tool names. Codex translates them automatically:
+
+| Claude Code | Codex |
+|---|---|
+| `Task` (dispatch subagent) | `spawn_agent` |
+| `TodoWrite` | `update_plan` |
+| `Skill` (invoke skill) | native — loads automatically |
+| `Read`, `Write`, `Edit` | native file tools |
+| `Bash` | native shell tools |
+
+You don't need to do anything — Codex handles this translation via its built-in `codex-tools.md` reference from superpowers.
 
 ---
 
