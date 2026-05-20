@@ -11,7 +11,7 @@ For "add", "change", "update", "modify", "replace" intent.
 1. Read the relevant file(s) before touching anything
 2. Make the change directly — no agents for simple edits
 3. Invoke `superpowers:verification-before-completion` before declaring done
-4. Report: "Done. [what changed, file:line]"
+4. Report only with evidence: "Updated [file:line]. Verified with [command]."
 
 Never touch files outside what was asked. If scope is unclear, ask one question.
 
@@ -28,7 +28,7 @@ Invoke `superpowers:systematic-debugging`.
 3. Apply fix
 4. Verify fix didn't break anything else
 
-Report: fix applied + one-line root cause (only if it helps avoid the same mistake).
+Report only with evidence: "Fixed [root cause]. Verified via [test or repro]."
 
 ---
 
@@ -54,7 +54,7 @@ Invoke `superpowers:finishing-a-development-branch`.
 3. Commit with a descriptive message (what changed and why)
 4. Push to current branch
 
-Report: "Committed to [branch]. [N] files changed."
+Report only after git confirms it: "Committed [short-sha] on [branch]."
 
 ---
 
@@ -72,4 +72,4 @@ What "yes / ok / looks good" means at each point in a build:
 | After a change/fix | Done looks right | Close out |
 | After explanation | Got it | Continue |
 
-If "yes" is ambiguous, check which stage you're in and advance accordingly.
+If "yes" is ambiguous and there is no active stage, do not auto-route. Ask one orienting question instead.

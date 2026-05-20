@@ -4,7 +4,7 @@
 
 Before asking any questions, check if the prompt-improver skill already ran and collected answers. If it did, use those answers to skip or reduce questions here — don't ask the same thing twice.
 
-If the prompt arrived already enriched (user answered clarifying questions from the hook), jump directly to generating the plain-English summary.
+If the prompt arrived already enriched (user answered clarifying questions from the hook), jump directly to generating the compact summary unless one key gap remains.
 
 Turn Jake's vague description into a clear, agreed-upon spec through back-and-forth conversation.
 
@@ -15,36 +15,40 @@ Turn Jake's vague description into a clear, agreed-upon spec through back-and-fo
 - Never ask about tech stack, database, hosting, or architecture
 - Never ask anything that requires technical knowledge to answer
 - Keep it conversational — adjust based on Jake's pushback
+- Ask at most 3 questions total, and stop earlier if the brief is already clear
 
 ---
 
-## Six Dimensions to Uncover
+## Five Dimensions to Uncover
 
-Ask questions until all six are clear. Stop asking once you have them.
+Ask questions until the brief is clear. Stop once you can summarize the request confidently.
 
 1. **Core goal** — what it does in one sentence
 2. **Who uses it** — and what they're trying to accomplish
 3. **Key actions** — what they open, click, see
 4. **Must-haves** — what's essential vs. nice-to-have
-5. **Success** — what "done" looks like in plain terms
-6. **Constraints** — anything that can't change (deadline, existing system, required tools)
+5. **Constraints / success** — fixed requirements plus what "done" looks like
 
 ---
 
 ## After You Have Enough Context
 
-Generate a plain-English summary with no jargon:
+Generate a compact plain-English brief with no jargon:
 
 ```
-WHAT IT DOES: [one sentence]
-WHO USES IT: [who and why]
-EVERY FEATURE: [bulleted list of everything it does]
-WHAT DONE LOOKS LIKE: [plain description of the finished thing]
+GOAL: [one sentence]
+WHO + FLOW: [who uses it and their typical flow]
+MUST-HAVES:
+- ...
+OUT OF SCOPE:
+- ...
+DONE:
+- ...
 ```
 
 Then ask:
 
-> "Anything you want to change or push back on before I write the plan?"
+> "Anything off before I write the plan?"
 
 Loop on feedback until Jake says yes, ok, or looks good.
 

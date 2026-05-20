@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pilot"
+  short_description: "Route build, debug, improve, explain, and ship work"
+  default_prompt: "Use $pilot to route this request into the right build, debug, improve, explain, or finish workflow."
+policy:
+  allow_implicit_invocation: true

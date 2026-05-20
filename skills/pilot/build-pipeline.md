@@ -10,30 +10,29 @@ Before asking anything, read the project directory to understand what already ex
 - Check for existing files, config, dependencies
 - Note the stack, any partial work, constraints in CLAUDE.md
 - Silently inform all later steps — do NOT report findings to user unless directly relevant
+- Never mention files, previews, URLs, or run commands until they have actually been created or verified
 
 ---
 
 ## Step 1 — Discovery (Product Questions Only)
 
-Ask questions one at a time. No tech jargon. Score 8 dimensions after each answer.
-Stop when all 8 are at 90%+. Typical: 5–15 questions.
+Ask at most 3 product questions, one at a time. No tech jargon.
+Skip any dimension already answered in the prompt or prior turns. If the prompt already makes the key dimensions clear, skip discovery entirely.
 
 | Dimension | What You Need |
 |---|---|
 | Core purpose | What it does in one sentence |
 | Users | Who uses it and their goal |
 | Key flows | What they open, click, see |
-| Primary function | Most important thing it does |
-| Feature scope | Must-haves vs nice-to-haves |
-| Success | What "done" looks like |
-| Data / APIs | What data it needs, any connections |
-| Visual | Any UI requirements or examples |
+| Must-haves | What is essential vs. optional |
+| Constraints / done | Anything fixed plus what success looks like |
 
 **Rules:**
 - One question per message
 - Plain English — no framework names, no architecture choices
 - Multiple choice preferred when options are clear
 - Never ask about stack, database, hosting — you decide those silently
+- Stop as soon as you can write a compact brief with reasonable assumptions
 
 ---
 
@@ -42,46 +41,34 @@ Stop when all 8 are at 90%+. Typical: 5–15 questions.
 Before writing the spec, count estimated tasks.
 
 **If 8+ tasks:** Stop. Say:
-> "This is a big build — roughly [N] pieces of work. I can build the full thing, or we can start with the core and add from there. Which do you want?"
+> "This is larger than one clean pass. I recommend starting with the core slice first; if you want the full map now, I can do that."
 
-Wait for answer. If "core first": ask what the one most important piece is, scope down, continue.
-If "full build": continue as-is.
+If Jake wants the core first, ask for the one most important slice and scope down.
+If Jake wants the full map, continue as-is.
 
 **If under 8 tasks:** Proceed directly to Step 3.
 
 ---
 
-## Step 3 — Rich Plain-English Summary
+## Step 3 — Compact Build Brief
 
-Generate a full spec internally (you pick the stack: Python/Flask + vanilla JS/CSS + SQLite, no npm, no build step). Then show a plain-English summary — no tech jargon, no code. Structured exactly like this:
+Generate a full spec internally (you pick the stack: Python/Flask + vanilla JS/CSS + SQLite, no npm, no build step). Then show a compact plain-English brief — no tech jargon, no code. Structured exactly like this:
 
 ---
 
-**WHAT IT DOES**
-One paragraph. What the app does as if explaining to a non-technical person.
-
-**WHO USES IT + HOW**
-Who opens the app and what their typical session looks like from start to finish.
-
-**EVERY FEATURE**
-Bulleted list. Every feature, no summaries. If it does something, it's on this list.
-
-**WHAT GETS CREATED**
-List every file that will be created and what it does in one line each.
-
-**HOW TO RUN IT**
-Exact command to start the app. What URL to open.
-
-**DATA + CONNECTIONS**
-What data gets stored. Any APIs or external services connected.
-
-**WHAT "DONE" LOOKS LIKE**
-Specific outcomes. "User can do X", "App shows Y", "Data persists across Z".
+GOAL: one sentence
+WHO + FLOW: one short paragraph
+MUST-HAVES:
+- ...
+OUT OF SCOPE:
+- ...
+DONE:
+- ...
 
 ---
 
 After showing the summary, ask:
-> "Anything you want to push back on or change before I write the full plan?"
+> "Anything off before I write the plan?"
 
 If Jake has feedback → revise the summary and ask again.
 If "looks good" / "no" / approval → proceed to Step 4.

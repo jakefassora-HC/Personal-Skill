@@ -1,6 +1,6 @@
 # Token Usage
 
-Load this file only when the task is long, context-heavy, repetitive, or likely to exceed budget.
+These rules expand the always-on token discipline in `SKILL.md`. Read this file when the task is long, context-heavy, repetitive, or when you need deterministic compression.
 
 ## Defluff Mode
 
@@ -72,6 +72,9 @@ state:
   loaded: router.md|build-pipeline.md|pipelines.md|token-usage.md
   decisions: [short list]
   constraints: [must keep]
+  artifacts_planned: [things not created yet]
+  artifacts_observed: [things you saw exist]
+  artifacts_verified: [things you proved]
   next: one action
 ```
 
@@ -106,7 +109,7 @@ The first version costs a few more tokens but is safer for future agents to resu
 3. `build-pipeline.md` is loaded only after a Standard or Deep build path is confirmed.
 4. `pipelines.md` is loaded only for Improve, Debug, Explain, Finish, or stage tracking.
 5. `token-usage.md` is loaded only for long or context-heavy tasks.
-6. `scripts/defluff.js` is optional. Use it only when a prompt or block of instructions needs deterministic compression.
+6. `scripts/defluff.js` is for long prompt blocks or deterministic cleanup. Never run it on raw approval or redirect replies.
 
 ## Compression Guardrails
 
@@ -121,5 +124,6 @@ Never compress away:
 - External API, table, or schema names
 - The current active stage
 - Values inside code or quotes
+- The difference between planned, observed, and verified artifacts
 
-If compression risks ambiguity, keep the longer form.
+If compression risks ambiguity, keep the longer form. Never compress a planned file, command, URL, or status into an existing fact.

@@ -32,19 +32,17 @@ Check the description against these signals:
 
 ## Step 3 — State the classification
 
-Say exactly this (fill in the brackets):
+If confidence is high, say:
 
-> "This looks like a **[QUICK / STANDARD / DEEP]** task — about [time estimate]."
+> "This looks like a **[QUICK / STANDARD / DEEP]** task — about [time estimate]. I'll treat it that way unless you want quick, standard, or deep instead."
 
-Then ask:
+Then continue immediately.
 
-> "Does that sound right? You can say quick, standard, or deep to adjust."
-
-Wait for Jake to confirm or correct. Do not proceed until he does.
+Only ask Jake to confirm or correct the classification when the boundary is genuinely ambiguous.
 
 ## Step 4 — Load the right pipeline
 
-Once Jake confirms, load **one** of the following:
+Load **one** of the following based on the confirmed or high-confidence classification:
 
 - **QUICK** — Skip the planning phase. Execute directly using the Improve pipeline in `pipelines.md`. No spec needed.
 
