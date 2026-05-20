@@ -1,6 +1,6 @@
 ---
 name: prompt-improver
-description: Research-first clarification engine. Fires when a vague prompt is detected by the UserPromptSubmit hook. Researches codebase context before asking any questions, then generates targeted AskUserQuestion calls grounded in actual findings. Use when a prompt lacks enough specificity to execute well and the hook has flagged it for clarification.
+description: Use when the UserPromptSubmit hook or an explicit request identifies a genuinely vague software prompt that needs 1-3 targeted clarification questions after a quick repo scan. Skip it when the request already names files, errors, or a clear action.
 ---
 
 # prompt-improver
@@ -26,7 +26,7 @@ Route all file exploration through Task or Explore agents. Never call Glob, Grep
 
 ## Phase 2 — QUESTION GENERATION
 
-Generate 1–6 targeted questions based on research findings.
+Generate 1–3 targeted questions based on research findings.
 
 **Rules:**
 - Each question addresses exactly ONE decision point
@@ -38,9 +38,9 @@ Generate 1–6 targeted questions based on research findings.
 
 | Prompt type | Questions |
 |---|---|
-| Simple / narrow scope | 1–2 |
-| Moderate / multiple unknowns | 3–4 |
-| Complex / cross-cutting | 5–6 (max) |
+| Simple / narrow scope | 1 |
+| Moderate / multiple unknowns | 2 |
+| Complex / cross-cutting | 3 (max) |
 
 **AskUserQuestion format:**
 
@@ -73,7 +73,7 @@ Do not explain why you are asking. Do not summarize what you are doing. Just ask
 Once answers are collected:
 
 1. Merge answers with original prompt to form an enriched request
-2. Hand off to the `start` skill for routing
+2. Hand off to the `$start` skill for routing
 3. Do not re-ask anything already answered
 
 ---
@@ -93,6 +93,6 @@ When in doubt, lean toward executing — only invoke this skill when clarificati
 
 - Research before every question. No exceptions.
 - Questions must cite findings, not assumptions.
-- Never ask more than 6 questions total.
+- Never ask more than 3 questions total.
 - Never ask generic questions like "what framework?" — find the framework first.
 - If the prompt is clear, skip this skill entirely.

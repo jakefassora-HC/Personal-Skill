@@ -1,8 +1,14 @@
-# Personal Skill - pilot
+# Personal Skill Bundle
 
 `pilot` is Jake's personal workflow router for build, debug, improve, explain, and ship requests.
 
-It works as a single skill folder under `skills/pilot` and loads only the file needed for the current task:
+The repo ships a small skill bundle:
+
+- `skills/pilot` - the main user-facing router
+- `skills/start` - a narrower support router for enriched handoffs
+- `skills/prompt-improver` - the optional clarification helper used by the prompt hook
+
+`pilot` still does the main routing work and loads only the file it needs for the current task:
 
 - `SKILL.md` - compact trigger rules, profile directives, and routing table
 - `router.md` - Quick / Standard / Deep build classification
@@ -32,10 +38,12 @@ From the repo root:
 ./install.sh
 ```
 
-That installs `skills/pilot` into:
+This copies the bundled skill folders into:
 
-- `~/.claude/skills/pilot`
-- `~/.agents/skills/pilot` as a symlink to the Claude Code copy, when possible
+- `~/.claude/skills/`
+- `${CODEX_HOME:-~/.codex}/skills/`
+
+`skills/*/agents/openai.yaml` files ship as Codex metadata inside each installed skill folder; they do not change the install destination.
 
 Restart Claude Code or Codex after installing.
 
@@ -59,11 +67,13 @@ Both:
 ./install.sh --both
 ```
 
-Custom source folder:
+Single-skill install:
 
 ```bash
 ./install.sh --source ./skills/pilot --both
 ```
+
+Use the default bundle install if you want the `start` and `prompt-improver` support skills available alongside `pilot`.
 
 ## Make commands
 
@@ -71,6 +81,7 @@ Custom source folder:
 make install
 make install-claude
 make install-codex
+make test
 ```
 
 ## Codex multi-agent support
@@ -83,3 +94,7 @@ multi_agent = true
 ```
 
 Improve, Debug, Explain, and Finish flows do not require multi-agent support.
+
+## Optional prompt hook
+
+`scripts/improve-prompt.py` is a `UserPromptSubmit` hook for genuinely vague prompts. It should stay quiet for specific asks and only route into `prompt-improver` when clarification would materially change the build.

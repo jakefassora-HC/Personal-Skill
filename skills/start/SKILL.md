@@ -1,11 +1,11 @@
 ---
 name: start
-description: Universal entry point for Jake. Auto-fires on ANY intent — building, debugging, planning, brainstorming, changing, shipping, or even a single vague word. Replaces pilot, brainstorming, and prd-taskmaster. Use when the user wants to create a feature, fix a bug, add something, change something, think through an idea, scope a project, investigate broken behavior, plan work, brainstorm, discuss an idea, figure out what to build, ship or commit code, ask how something works, or says anything that could possibly lead to writing code or making a decision. Triggers on: build, create, add, change, update, fix, broken, error, not working, debug, crash, failing, help me, brainstorm, think, plan, scope, idea, what if, should I, how do I, why is, ship, commit, push, deploy, and vague single-word prompts like "dashboard", "broken", "pipeline", "idea", "this", "feature". When in doubt, trigger this skill.
+description: Use when a prompt-improver handoff or explicit routing request needs one pass of classify → brainstorm, plan, debug, or finish. Trigger on enriched build/change/debug/ship requests that still need routing. Do not trigger on bare acknowledgements or vague nouns without supporting context.
 ---
 
 # start
 
-Universal entry point. One job: detect what Jake wants and route to the right pipeline.
+Support router. One job: take an already-enriched request and route it to the right pipeline.
 
 ## Profile (always active)
 
@@ -28,7 +28,7 @@ Read the message and assign one signal:
 | **vague/idea/build/brainstorm** | New concept, unclear scope, "what if", "help me think", single-word noun, building from scratch |
 | **debug** | Error text, "broken", "not working", "failing", "crash", "why isn't", unexpected behavior |
 | **change/fix** | "add", "update", "change", "remove", small scoped modification to something existing |
-| **advance** | "yes", "ok", "approved", "looks good", "do it", "go ahead", "sounds right" |
+| **advance** | "yes", "ok", "approved", "looks good", "do it", "go ahead", "sounds right" during an active stage |
 | **reject** | "no", "wrong", "not that", "different", "not what I meant" |
 | **ship** | "commit", "push", "ship", "deploy", "PR", "merge" |
 | **explain** | "why", "how does", "what is", "explain" |
@@ -43,7 +43,7 @@ Read the message and assign one signal:
 
 **change/fix** → read `classify.md` — if Quick, proceed inline; if Standard/Deep, route to `plan.md`
 
-**advance** → continue at current pipeline stage (brainstorm → plan → execute → finish)
+**advance** → continue only when a current pipeline stage is active
 
 **reject** → stop everything, ask one clarifying question, wait
 
@@ -73,3 +73,4 @@ Read the message and assign one signal:
 - Never assume the stack or architecture — Jake can't answer those questions anyway.
 - If the signal is ambiguous between two routes, pick the simpler one and move.
 - If Jake corrects the route, adjust immediately without defense.
+- If there is no active stage, bare `yes/ok/no` is not enough to route.

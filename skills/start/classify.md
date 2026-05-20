@@ -28,9 +28,9 @@ Run this silently before responding. Classify the task, then show Jake one confi
 
 After classifying silently, show Jake exactly one line:
 
-> "This looks like a [QUICK/STANDARD/DEEP] task — about [time]. [one-line reason]. Say 'quick', 'standard', or 'deep' to adjust."
+> "This looks like a [QUICK/STANDARD/DEEP] task — about [time]. [one-line reason]. I'll treat it that way unless you want quick, standard, or deep instead."
 
-Wait for Jake to confirm or correct before loading anything else.
+Only wait for confirmation when the boundary is genuinely ambiguous.
 
 ---
 

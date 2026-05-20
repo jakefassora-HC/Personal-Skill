@@ -12,6 +12,7 @@ Exit codes:
 """
 
 import json
+import re
 import sys
 
 
@@ -31,6 +32,58 @@ When in doubt, proceed — only invoke prompt-improver if clarification is truly
 User prompt:
 {prompt}"""
 
+ACTION_VERBS = {
+    "add",
+    "build",
+    "change",
+    "commit",
+    "create",
+    "debug",
+    "deploy",
+    "document",
+    "explain",
+    "fix",
+    "improve",
+    "investigate",
+    "merge",
+    "plan",
+    "push",
+    "refactor",
+    "remove",
+    "rename",
+    "replace",
+    "ship",
+    "update",
+    "write",
+}
+
+DEBUG_HINTS = {
+    "broken",
+    "crash",
+    "error",
+    "failing",
+    "mismatch",
+    "not working",
+    "traceback",
+}
+
+VAGUE_PROMPTS = {
+    "app",
+    "broken",
+    "dashboard",
+    "feature",
+    "help",
+    "idea",
+    "pipeline",
+    "this",
+}
+
+FILE_HINT_RE = re.compile(
+    r"[/\\]|`[^`]+`|\b[\w.-]+\.(?:py|md|js|ts|tsx|jsx|json|toml|yaml|yml|sh)\b"
+)
+
+WORD_RE = re.compile(r"[a-z0-9_.-]+")
+
 
 def build_output(additional_context: str) -> dict:
     return {
@@ -39,6 +92,42 @@ def build_output(additional_context: str) -> dict:
             "additionalContext": additional_context,
         }
     }
+
+
+def _word_tokens(prompt: str) -> list[str]:
+    return WORD_RE.findall(prompt.lower())
+
+
+def prompt_is_specific(prompt: str) -> bool:
+    stripped = prompt.strip()
+    if not stripped:
+        return True
+
+    words = _word_tokens(stripped)
+    if not words:
+        return False
+
+    if len(words) <= 2 and all(word in VAGUE_PROMPTS for word in words):
+        return False
+
+    lower = stripped.lower()
+
+    if "\n" in stripped and len(stripped) >= 40:
+        return True
+
+    if FILE_HINT_RE.search(stripped):
+        return True
+
+    if any(hint in lower for hint in DEBUG_HINTS) and len(words) >= 4:
+        return True
+
+    if any(word in ACTION_VERBS for word in words) and len(words) >= 5:
+        return True
+
+    if stripped.endswith("?") and len(words) >= 5:
+        return True
+
+    return False
 
 
 def main() -> None:
@@ -70,6 +159,10 @@ def main() -> None:
         output["hookSpecificOutput"]["suppressedPrompt"] = prompt
         output["hookSpecificOutput"]["prompt"] = stripped
         print(json.dumps(output))
+        sys.exit(0)
+
+    if prompt_is_specific(prompt):
+        print(json.dumps(build_output("")))
         sys.exit(0)
 
     # All other prompts: wrap with evaluation instructions

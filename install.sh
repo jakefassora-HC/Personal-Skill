@@ -2,19 +2,24 @@
 set -euo pipefail
 
 MODE="both"
-SOURCE_DIR="skills/pilot"
+SOURCE_DIR=""
+BUNDLED_SKILLS=(
+  "skills/pilot"
+  "skills/start"
+  "skills/prompt-improver"
+)
 
 usage() {
   cat <<'USAGE'
 Usage: ./install.sh [--both|--claude|--codex] [--source PATH]
 
-Installs the pilot skill for Claude Code and/or Codex.
+Installs the Personal-Skill bundle for Claude Code and/or Codex.
 
 Options:
   --both          Install for Claude Code and Codex (default)
   --claude        Install for Claude Code only
   --codex         Install for Codex only
-  --source PATH   Skill folder to install (default: skills/pilot)
+  --source PATH   Install only one skill folder instead of the default bundle
   -h, --help      Show this help
 USAGE
 }
@@ -37,36 +42,58 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ ! -f "$SOURCE_DIR/SKILL.md" ]]; then
-  echo "error: $SOURCE_DIR does not look like a skill folder; missing SKILL.md" >&2
-  exit 1
-fi
-
 CLAUDE_SKILLS="$HOME/.claude/skills"
-CLAUDE_TARGET="$CLAUDE_SKILLS/pilot"
-CODEX_SKILLS="$HOME/.agents/skills"
-CODEX_TARGET="$CODEX_SKILLS/pilot"
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+CODEX_SKILLS="$CODEX_HOME_DIR/skills"
+
+skill_sources() {
+  if [[ -n "$SOURCE_DIR" ]]; then
+    printf '%s\n' "$SOURCE_DIR"
+    return
+  fi
+
+  printf '%s\n' "${BUNDLED_SKILLS[@]}"
+}
+
+validate_sources() {
+  while IFS= read -r skill_dir; do
+    [[ -n "$skill_dir" ]] || continue
+    if [[ ! -f "$skill_dir/SKILL.md" ]]; then
+      echo "error: $skill_dir does not look like a skill folder; missing SKILL.md" >&2
+      exit 1
+    fi
+  done < <(skill_sources)
+}
+
+install_into() {
+  local target_root="$1"
+  local label="$2"
+
+  mkdir -p "$target_root"
+
+  while IFS= read -r skill_dir; do
+    [[ -n "$skill_dir" ]] || continue
+    local skill_name
+    local target_dir
+
+    skill_name="$(basename "$skill_dir")"
+    target_dir="$target_root/$skill_name"
+
+    rm -rf "$target_dir"
+    cp -R "$skill_dir" "$target_dir"
+    echo "installed $label skill: $target_dir"
+  done < <(skill_sources)
+}
 
 install_claude() {
-  mkdir -p "$CLAUDE_SKILLS"
-  rm -rf "$CLAUDE_TARGET"
-  cp -R "$SOURCE_DIR" "$CLAUDE_TARGET"
-  echo "installed Claude Code skill: $CLAUDE_TARGET"
+  install_into "$CLAUDE_SKILLS" "Claude Code"
 }
 
 install_codex() {
-  mkdir -p "$CODEX_SKILLS"
-
-  if [[ -d "$CLAUDE_TARGET" ]]; then
-    rm -rf "$CODEX_TARGET"
-    ln -sfn "$CLAUDE_TARGET" "$CODEX_TARGET" 2>/dev/null || cp -R "$CLAUDE_TARGET" "$CODEX_TARGET"
-  else
-    rm -rf "$CODEX_TARGET"
-    cp -R "$SOURCE_DIR" "$CODEX_TARGET"
-  fi
-
-  echo "installed Codex skill: $CODEX_TARGET"
+  install_into "$CODEX_SKILLS" "Codex"
 }
+
+validate_sources
 
 case "$MODE" in
   both)
@@ -81,4 +108,4 @@ case "$MODE" in
     ;;
 esac
 
-echo "restart Claude Code or Codex to load the updated pilot skill"
+echo "restart Claude Code or Codex to load the updated skills"
