@@ -1,5 +1,11 @@
 # Brainstorm
 
+## Prompt Quality Check (runs first)
+
+Before asking any questions, check if the prompt-improver skill already ran and collected answers. If it did, use those answers to skip or reduce questions here — don't ask the same thing twice.
+
+If the prompt arrived already enriched (user answered clarifying questions from the hook), jump directly to generating the plain-English summary.
+
 Turn Jake's vague description into a clear, agreed-upon spec through back-and-forth conversation.
 
 ## Rules
