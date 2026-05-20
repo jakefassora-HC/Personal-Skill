@@ -1,13 +1,28 @@
-# Personal Skill — pilot
+# Personal Skill - pilot
 
 `pilot` is Jake's personal workflow router for build, debug, improve, explain, and ship requests.
 
-It works as a single skill folder under `skills/pilot` and loads only the pipeline file needed for the current task:
+It works as a single skill folder under `skills/pilot` and loads only the file needed for the current task:
 
-- `SKILL.md` — trigger rules, profile directives, and routing table
-- `router.md` — Quick / Standard / Deep build classification
-- `build-pipeline.md` — Standard and Deep build workflow
-- `pipelines.md` — Improve, Debug, Explain, Finish, and stage tracking
+- `SKILL.md` - compact trigger rules, profile directives, and routing table
+- `router.md` - Quick / Standard / Deep build classification
+- `build-pipeline.md` - Standard and Deep build workflow
+- `pipelines.md` - Improve, Debug, Explain, Finish, and stage tracking
+- `token-usage.md` - Defluff-style compression rules for long or context-heavy work
+
+## Token usage model
+
+`SKILL.md` stays small on purpose. It points to deeper files instead of carrying every rule inline.
+
+The skill uses Defluff mode by default:
+
+- avoid restating the full request
+- load only one route file at a time
+- summarize large context instead of copying it
+- keep progress updates short
+- preserve exact commands, file names, errors, and constraints
+
+Caveman-style shorthand is reserved for private state only. User-facing responses should stay clear enough to resume later.
 
 ## One-command install
 
@@ -26,25 +41,25 @@ Restart Claude Code or Codex after installing.
 
 ## Install options
 
-Install for Claude Code only:
+Claude Code only:
 
 ```bash
 ./install.sh --claude
 ```
 
-Install for Codex only:
+Codex only:
 
 ```bash
 ./install.sh --codex
 ```
 
-Install both:
+Both:
 
 ```bash
 ./install.sh --both
 ```
 
-Use a custom skill source folder:
+Custom source folder:
 
 ```bash
 ./install.sh --source ./skills/pilot --both
@@ -53,33 +68,9 @@ Use a custom skill source folder:
 ## Make commands
 
 ```bash
-make install          # same as ./install.sh --both
-make install-claude   # Claude Code only
-make install-codex    # Codex only
-```
-
-## Manual install
-
-Claude Code:
-
-```bash
-mkdir -p ~/.claude/skills
-rm -rf ~/.claude/skills/pilot
-cp -R skills/pilot ~/.claude/skills/pilot
-```
-
-Codex:
-
-```bash
-mkdir -p ~/.agents/skills
-ln -sfn ~/.claude/skills/pilot ~/.agents/skills/pilot
-```
-
-If symlinks are not available, copy instead:
-
-```bash
-rm -rf ~/.agents/skills/pilot
-cp -R skills/pilot ~/.agents/skills/pilot
+make install
+make install-claude
+make install-codex
 ```
 
 ## Codex multi-agent support
