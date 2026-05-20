@@ -1,6 +1,6 @@
 ---
 name: pilot
-description: Use when the user says "let's build", "create", "add", "change", "it's broken", "why does", "commit", or any variant. Personal workflow router — detects intent from natural language and chains the right superpowers skills automatically.
+description: Use when the user says "let's build", "create", "add", "change", "it's broken", "why does", "commit", "brainstorm", or any variant. Personal workflow router — detects intent from natural language and chains the right superpowers skills automatically.
 ---
 
 # Pilot
@@ -11,7 +11,7 @@ Detect intent, read the right pipeline file, execute. Profile directives always 
 
 | Your Words | Intent | Load |
 |---|---|---|
-| `let's`, `build`, `create`, `new`, `I want a`, `want to start` | New build | read `build-pipeline.md` |
+| `let's`, `build`, `create`, `new`, `I want a`, `want to start`, `brainstorm`, `help me think`, `scope this`, `what would it take` | New build | read `router.md` → then `build-pipeline.md` |
 | `add`, `change`, `update`, `modify`, `improve`, `I want you to`, `replace` | Quick change | read `pipelines.md` → Improve |
 | Error paste, `broken`, `not working`, `big issue`, `real issue`, `I can't` | Debug | read `pipelines.md` → Debug |
 | `yes`, `yeah`, `ok`, `great`, `looks good`, `approved`, `do it` | Approve | advance active pipeline stage |
@@ -20,9 +20,11 @@ Detect intent, read the right pipeline file, execute. Profile directives always 
 | `commit`, `push`, `save`, `ship`, `deploy` | Ship | read `pipelines.md` → Finish |
 | Unclear / vague / single word | Infer | read last 3 messages, infer |
 
-**Pipeline files:** `~/.claude/skills/pilot/build-pipeline.md` and `~/.claude/skills/pilot/pipelines.md`
+**New build flow:** read `router.md` first to classify Quick/Standard/Deep, then load `build-pipeline.md`.
 
-Read the relevant file when routing to that pipeline. Do not load both upfront.
+**Pipeline files:** `~/.claude/skills/pilot/build-pipeline.md`, `~/.claude/skills/pilot/pipelines.md`, `~/.claude/skills/pilot/router.md`
+
+Read the relevant file when routing to that pipeline. Do not load all files upfront.
 
 ## Profile Directives (Always Active — No File Read Needed)
 

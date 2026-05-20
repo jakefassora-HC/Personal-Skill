@@ -1,6 +1,6 @@
 # Build Pipeline
 
-Full flow for "let's build X" intent. Execute steps in order.
+Full flow for STANDARD and DEEP builds after the router has classified intent. Execute steps in order.
 
 ---
 
@@ -80,7 +80,11 @@ Specific outcomes. "User can do X", "App shows Y", "Data persists across Z".
 
 ---
 
-Wait for "yes", "ok", "looks good", or approval. If no, re-ask one question and revise.
+After showing the summary, ask:
+> "Anything you want to push back on or change before I write the full plan?"
+
+If Jake has feedback → revise the summary and ask again.
+If "looks good" / "no" / approval → proceed to Step 4.
 
 ---
 
@@ -95,19 +99,49 @@ Write a short contract block covering:
 
 Include this contract in the plan as a shared reference for all agents.
 
+Then write a clean HTML plan file:
+
+1. Create `.planning/` in the project root if it doesn't exist
+2. Write `.planning/plan.html` with:
+   - Goal and feature list
+   - Task breakdown with PARALLEL / SEQUENTIAL labels
+   - Agent assignments
+   - Time estimate
+   - Style: system font, max-width 860px, clean and readable
+3. Tell Jake:
+   > "Plan saved. Run: `open .planning/plan.html`"
+4. Wait for Jake to review and approve before executing anything.
+
 ---
 
-## Step 5 — Plan + Build
+## Step 5 — Execute
 
-Invoke `superpowers:writing-plans` — pass the spec and interface contract.
+### DEEP tasks (multi-week projects)
 
-After plan is written, invoke `superpowers:subagent-driven-development` to execute.
+After plan is approved, say:
+> "This is a multi-week project. I'll use GSD to document and track progress. Run `/gsd-plan-phase` to begin."
 
-Agent team per task:
+Then stop. Do not execute. Let GSD take over.
+
+---
+
+### STANDARD tasks
+
+After plan is approved, dispatch agents based on what the plan requires:
+
+- **UI work only** → UI agent handles all frontend
+- **Backend work only** → backend agent handles all API/logic
+- **Both** → run UI and backend agents in parallel; use the interface contract to prevent conflicts
+
+**Always include:**
+- A reviewer agent that checks output against the spec after each task completes
+- Atomic commits per task
+
+**Agent team per task:**
 1. Implementer (TDD: test → fail → code → pass)
 2. Spec reviewer (does code match spec? nothing missing, nothing extra?)
 3. Code quality reviewer (clean, no regressions, no hacks?)
 
-Final reviewer checks entire implementation end-to-end after all tasks complete.
+Final reviewer checks the entire implementation end-to-end after all tasks complete.
 
-When done: tell user the exact command to run the app.
+When done: tell Jake the exact command to run the app.
